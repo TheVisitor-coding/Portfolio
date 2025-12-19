@@ -1,6 +1,5 @@
 import SmoothScroll from "@/components/layout/SmoothScroll";
 import Hero from "@/components/sections/Hero";
-import Experience from "@/components/sections/Experience";
 import Tools from "@/components/sections/Tools";
 import BentoGrid from "@/components/sections/BentoGrid";
 import Projects from "@/components/sections/Projects";
@@ -11,7 +10,6 @@ export default function Home() {
     <SmoothScroll>
       <main className="flex min-h-screen flex-col bg-background">
         <Hero />
-        <Experience />
 
         <div className="relative z-10 space-y-24 pb-24">
           <BentoGrid />

@@ -21,189 +21,138 @@ const TOOLS = [
 ];
 
 export default function Tools() {
+    const sectionRef = useRef<HTMLElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const sectionRef = useRef<HTMLDivElement>(null);
-
-    // Store node positions
-    const nodes = useRef<{ x: number, y: number, radius: number }[]>([]);
+    const iconRefs = useRef<(HTMLDivElement | null)[]>([]);
 
     useEffect(() => {
-        const section = sectionRef.current;
+        const canvas = canvasRef.current;
+        const container = containerRef.current;
+        if (!canvas || !container) return;
 
-        // Animate section title fade in
-        gsap.fromTo(section,
-            { opacity: 0 },
-            {
-                opacity: 1,
-                duration: 1,
-                scrollTrigger: {
-                    trigger: section,
-                    start: "top 60%"
-                }
-            }
-        );
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
 
-        // GSAP Magnet Effect
-        const items = document.querySelectorAll(".tool-node");
+        let animationFrameId: number;
 
-        // Distribute randomly but avoid overlapping too much (simple random for now)
-        // We will let CSS handle initial grid but then we might break it? 
-        // Actually the requested design is "Scattered". Let's use absolute positioning relative to container
-        // But for responsiveness, maybe we stick to a loose grid and use transforms to scatter slightly?
+        const setCanvasSize = () => {
+            canvas.width = container.offsetWidth;
+            canvas.height = container.offsetHeight;
+        };
 
-        // Better: Use the canvas for lines, and DOM elements for icons
+        window.addEventListener("resize", setCanvasSize);
+        setCanvasSize();
 
+        // Mouse Tracker
+        const mouse = { x: -1000, y: -1000 };
         const handleMouseMove = (e: MouseEvent) => {
-            if (!containerRef.current || !canvasRef.current) return;
-
-            const rect = containerRef.current.getBoundingClientRect();
-            const mx = e.clientX - rect.left;
-            const my = e.clientY - rect.top;
-
-            // Attract nodes to mouse
-            items.forEach((item, i) => {
-                const el = item as HTMLElement;
-                // Current pos (we can read from GSAP tracker or just offset)
-                // Use QuickTo for performance
-            });
-
-            // Draw lines
-            const ctx = canvasRef.current.getContext("2d");
-            if (!ctx) return;
-
-            ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-
-            // Update node list from DOM positions
-            const currentNodes: { x: number, y: number }[] = [];
-
-            items.forEach((item) => {
-                const el = item as HTMLElement;
-                // Get center relative to container
-                const x = el.offsetLeft + el.offsetWidth / 2;
-                const y = el.offsetTop + el.offsetHeight / 2;
-                currentNodes.push({ x, y });
-            });
-
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-
-            // Double loop for connections
-            for (let i = 0; i < currentNodes.length; i++) {
-                for (let j = i + 1; j < currentNodes.length; j++) {
-                    const dx = currentNodes[i].x - currentNodes[j].x;
-                    const dy = currentNodes[i].y - currentNodes[j].y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-
-                    if (dist < 200) { // Connection threshold
-                        ctx.moveTo(currentNodes[i].x, currentNodes[i].y);
-                        ctx.lineTo(currentNodes[j].x, currentNodes[j].y);
-                    }
-                }
-
-                // Connect to mouse if close
-                const dmx = currentNodes[i].x - mx;
-                const dmy = currentNodes[i].y - my;
-                const distM = Math.sqrt(dmx * dmx + dmy * dmy);
-
-                if (distM < 300) {
-                    ctx.moveTo(currentNodes[i].x, currentNodes[i].y);
-                    ctx.lineTo(mx, my);
-                }
-            }
-            ctx.stroke();
+            const rect = container.getBoundingClientRect();
+            mouse.x = e.clientX - rect.left;
+            mouse.y = e.clientY - rect.top;
         };
 
-        // Resize canvas
-        const handleResize = () => {
-            if (containerRef.current && canvasRef.current) {
-                canvasRef.current.width = containerRef.current.offsetWidth;
-                canvasRef.current.height = containerRef.current.offsetHeight;
-            }
+        // We only care about mouse relative to the container when hovering the container?
+        // Or global? Let's do container relative for the lines logic.
+        // But for smoother UX, maybe listen on window but adjust? 
+        // Let's listen on container for simplicity of "inside section".
+        container.addEventListener("mousemove", handleMouseMove);
+        container.addEventListener("mouseleave", () => { mouse.x = -1000; mouse.y = -1000; });
+
+        const animate = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw connections
+            iconRefs.current.forEach((icon) => {
+                if (!icon) return;
+
+                // Get icon center position relative to canvas (container)
+                // Since icons are absolutely positioned or flexed inside container, and canvas is absolute inset-0
+                const iconRect = icon.getBoundingClientRect();
+                const containerRect = container.getBoundingClientRect();
+
+                const ix = iconRect.left - containerRect.left + iconRect.width / 2;
+                const iy = iconRect.top - containerRect.top + iconRect.height / 2;
+
+                const dx = ix - mouse.x;
+                const dy = iy - mouse.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < 200) {
+                    const opacity = 1 - (dist / 200);
+                    ctx.beginPath();
+                    ctx.moveTo(ix, iy);
+                    ctx.lineTo(mouse.x, mouse.y);
+                    ctx.strokeStyle = `rgba(255, 255, 255, ${opacity * 0.8})`;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+
+                    // Optional: Highlight icon
+                    icon.style.transform = `scale(${1 + opacity * 0.2})`;
+                } else {
+                    icon.style.transform = `scale(1)`;
+                }
+            });
+
+            animationFrameId = requestAnimationFrame(animate);
         };
 
-        window.addEventListener("resize", handleResize);
-        window.addEventListener("mousemove", handleMouseMove); // Listener on window for ease or specific container? Better specific
-        containerRef.current?.addEventListener("mousemove", handleMouseMove);
-
-        handleResize();
+        animate();
 
         return () => {
-            window.removeEventListener("resize", handleResize);
-            containerRef.current?.removeEventListener("mousemove", handleMouseMove);
+            window.removeEventListener("resize", setCanvasSize);
+            container.removeEventListener("mousemove", handleMouseMove);
+            cancelAnimationFrame(animationFrameId);
         };
     }, []);
 
-    // Magnetic Logic separate effect using GSAP QuickTo
-    useEffect(() => {
-        const xTo: gsap.QuickToFunc[] = [];
-        const yTo: gsap.QuickToFunc[] = [];
-        const items = document.querySelectorAll(".tool-node");
+    // Random positioning logic
+    // We want them centered but random.
+    // Solution: predefined random positions or generate on client?
+    // Client side generation causes hydration mismatch.
+    // We'll use CSS classes with predefined random-ish positions or styles, OR use a useEffect to set positions.
+    // Best for "Refais entièrement": Use a layout that looks random but is reliable.
+    // Let's use absolute positioning with percentage.
 
-        items.forEach((item) => {
-            xTo.push(gsap.quickTo(item, "x", { duration: 0.5, ease: "power3" }));
-            yTo.push(gsap.quickTo(item, "y", { duration: 0.5, ease: "power3" }));
-        });
-
-        const handleMove = (e: MouseEvent) => {
-            const rect = containerRef.current?.getBoundingClientRect();
-            if (!rect) return;
-            const mx = e.clientX - rect.left;
-            const my = e.clientY - rect.top;
-
-            items.forEach((item, i) => {
-                const el = item as HTMLElement;
-                const ix = el.offsetLeft + el.offsetWidth / 2;
-                const iy = el.offsetTop + el.offsetHeight / 2;
-
-                const dist = Math.hypot(mx - ix, my - iy);
-
-                if (dist < 300) {
-                    const angle = Math.atan2(my - iy, mx - ix);
-                    // Attract by moving CLOSER to mouse
-                    const force = (300 - dist) / 10;
-                    xTo[i](Math.cos(angle) * force);
-                    yTo[i](Math.sin(angle) * force);
-                } else {
-                    xTo[i](0);
-                    yTo[i](0);
-                }
-            });
-        };
-
-        containerRef.current?.addEventListener("mousemove", handleMove);
-        return () => containerRef.current?.removeEventListener("mousemove", handleMove);
-    }, []);
+    // Seeded random-ish positions (x%, y%)
+    const positions = [
+        { top: '20%', left: '25%' },
+        { top: '30%', left: '60%' },
+        { top: '15%', left: '45%' },
+        { top: '50%', left: '30%' },
+        { top: '45%', left: '70%' },
+        { top: '65%', left: '40%' },
+        { top: '75%', left: '65%' },
+        { top: '80%', left: '25%' },
+        { top: '35%', left: '80%' },
+        { top: '60%', left: '15%' },
+    ];
 
     return (
-        <section id="stack" ref={sectionRef} className="relative min-h-[80vh] w-full flex flex-col items-center justify-center py-24 overflow-hidden">
-            <div className="mb-12 z-10 text-center">
+        <section ref={sectionRef} className="relative w-full py-24 flex flex-col items-center">
+            <div className="mb-12 text-center z-10">
                 <h2 className="text-4xl font-bold uppercase tracking-widest text-white/50 mix-blend-overlay">The Arsenal</h2>
             </div>
 
-            <div ref={containerRef} className="relative h-[600px] w-full max-w-6xl rounded-3xl border border-white/5 bg-black/20 backdrop-blur-sm overflow-hidden">
-                <canvas ref={canvasRef} className="absolute inset-0 z-0 opacity-50 pointer-events-none" />
+            <div ref={containerRef} className="relative h-[600px] w-full max-w-6xl rounded-3xl border border-white/5 bg-black/20 backdrop-blur-sm overflow-hidden cursor-crosshair">
+                <canvas ref={canvasRef} className="absolute inset-0 z-0 pointer-events-none" />
 
-                {/* Distributed Icons - absolute for organic feel or grid? Let's use a loose grid then offset random */}
-                {/* Actually, let's just place them in a flex wrap but give them big margins and relative positioning */}
-                <div className="relative z-10 h-full w-full flex flex-wrap items-center justify-center gap-24 p-24 content-center">
-                    {TOOLS.map((tool, i) => (
-                        <div
-                            key={tool.name}
-                            className="tool-node relative flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md transition-shadow hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]"
-                            style={{
-                                // Add slight random offset to break the grid
-                                transform: `translate(${Math.random() * 40 - 20}px, ${Math.random() * 40 - 20}px)`
-                            }}
-                        >
-                            <div className="h-8 w-8 text-neutral-300">
-                                <tool.icon className="h-full w-full" />
-                            </div>
-                            <span className="absolute -bottom-6 text-[10px] uppercase tracking-widest text-neutral-500 opacity-0 transition-opacity hover:opacity-100 group-hover:opacity-100">{tool.name}</span>
+                {TOOLS.map((tool, i) => (
+                    <div
+                        key={tool.name}
+                        ref={(el) => { iconRefs.current[i] = el; }}
+                        className="absolute flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md transition-all duration-300"
+                        style={{
+                            top: positions[i % positions.length].top,
+                            left: positions[i % positions.length].left,
+                        }}
+                    >
+                        <div className="h-8 w-8 text-neutral-300 pointer-events-none">
+                            <tool.icon className="h-full w-full" />
                         </div>
-                    ))}
-                </div>
+                        <span className="absolute -bottom-6 text-[10px] uppercase tracking-widest text-neutral-500 opacity-0 transition-opacity group-hover:opacity-100">{tool.name}</span>
+                    </div>
+                ))}
             </div>
         </section>
     );

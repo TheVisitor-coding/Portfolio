@@ -2,67 +2,61 @@
 
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import MagneticButton from "../ui/MagneticButton";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Footer() {
     const containerRef = useRef<HTMLDivElement>(null);
+    const pathRef1 = useRef<SVGPathElement>(null);
+    const pathRef2 = useRef<SVGPathElement>(null);
+    const pathRef3 = useRef<SVGPathElement>(null);
+    const pathRef4 = useRef<SVGPathElement>(null);
     const buttonRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const ctx = gsap.context(() => {
-            // Colors from the request: "Outer Wilds" to "Tech"
-            const colors = ["#818cf8", "#c084fc", "#34d399", "#22d3ee"];
-            const containerWidth = containerRef.current?.offsetWidth || window.innerWidth;
-            const containerHeight = containerRef.current?.offsetHeight || window.innerHeight;
+            // Animate lines along paths
+            const paths = [pathRef1.current, pathRef2.current, pathRef3.current, pathRef4.current];
 
-            // Create "Circuit Lines" that converge to center
-            const linesCount = 20;
+            paths.forEach((path, i) => {
+                if (!path) return;
 
-            for (let i = 0; i < linesCount; i++) {
-                const line = document.createElement("div");
-                const color = colors[i % colors.length];
+                // Get length of path
+                const length = path.getTotalLength();
 
-                line.className = "absolute blur-[1px]";
-                line.style.backgroundColor = color;
-
-                const isLeft = i % 2 === 0;
-
-                // Start position: Edges
-                line.style.top = `${Math.random() * 100}%`;
-                line.style.left = isLeft ? "-10%" : "110%";
-                line.style.width = "40px";
-                line.style.height = "2px";
-
-                containerRef.current?.appendChild(line);
-
-                // Converge to center (approximate button position)
-                gsap.to(line, {
-                    left: "50%",
-                    top: "50%",
-                    width: "2px",
-                    height: "2px",
-                    opacity: 0,
-                    duration: 1.5 + Math.random() * 1.5,
-                    delay: Math.random() * 2,
-                    repeat: -1,
-                    ease: "power2.in",
-                    onRepeat: () => {
-                        // Reset position slightly
-                        gsap.set(line, {
-                            top: `${Math.random() * 100}%`,
-                            left: isLeft ? "-10%" : "110%",
-                            width: "40px",
-                            height: "2px",
-                            opacity: 1
-                        });
-                    }
+                // Set initial dash array/offset to hide it
+                gsap.set(path, {
+                    strokeDasharray: length,
+                    strokeDashoffset: length,
+                    opacity: 0.5
                 });
-            }
 
-            // Heartbeat effect on the button wrapper when energy arrives
+                // Animate dashoffset to reveal and travel
+                // We want a "projectile" look, so we manipulate dasharray to create a short segment?
+                // Or just standard "draw" animation that loops.
+                // Request: "Trait lumineux le long de ces chemins"
+
+                // Create a "short dash" effect
+                gsap.set(path, {
+                    strokeDasharray: `100, ${length}`, // 100px dash, rest gap
+                    strokeDashoffset: length + 100 // Start fully retracted
+                });
+
+                gsap.to(path, {
+                    strokeDashoffset: 0,
+                    duration: 2 + (i * 0.5),
+                    repeat: -1,
+                    ease: "power1.inOut",
+                    delay: i * 0.2
+                });
+            });
+
+            // Heartbeat button
             gsap.to(buttonRef.current, {
                 scale: 1.05,
-                boxShadow: "0 0 30px rgba(96, 165, 250, 0.4)",
+                boxShadow: "0 0 40px rgba(56, 189, 248, 0.4)", // Cyan glos
                 duration: 0.8,
                 repeat: -1,
                 yoyo: true,
@@ -75,43 +69,55 @@ export default function Footer() {
     }, []);
 
     return (
-        <footer id="contact" ref={containerRef} className="relative flex h-screen w-full flex-col items-center justify-center overflow-hidden bg-black text-center">
-            {/* Background Gradient */}
-            <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-indigo-950/40 via-black to-black" />
+        <footer ref={containerRef} className="relative flex h-[80vh] w-full flex-col items-center justify-center overflow-hidden bg-black">
+            {/* SVG Container for Convergence Lines */}
+            <svg className="absolute inset-0 h-full w-full pointer-events-none z-0">
+                <defs>
+                    <linearGradient id="line-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#818cf8" />
+                        <stop offset="100%" stopColor="#34d399" />
+                    </linearGradient>
+                </defs>
 
-            <div className="relative z-10 flex flex-col items-center gap-16 px-4">
-                <div>
-                    <h2 className="text-5xl font-bold tracking-tighter text-white sm:text-7xl md:text-9xl mix-blend-soft-light">
-                        THE FINAL
-                    </h2>
-                    <h2 className="text-5xl font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 sm:text-7xl md:text-9xl animate-pulse">
-                        COMMIT
-                    </h2>
-                </div>
+                {/* Curves converging to center (approx 50% 50% or where button is) */}
+                {/* Let's assume button is at 50% 60% of container height-ish */}
 
-                <p className="max-w-md text-lg text-zinc-300 font-light">
-                    Your vision needs an architect. <br />
-                    I'm ready when you are.
-                </p>
+                {/* Left Top to Center */}
+                <path ref={pathRef1} d="M-100,100 C200,100 300,400 50% 60%" stroke="url(#line-gradient)" strokeWidth="2" fill="none" />
 
-                <div ref={buttonRef} className="rounded-full">
+                {/* Left Bottom to Center */}
+                <path ref={pathRef2} d="M-100,800 C200,800 300,500 50% 60%" stroke="url(#line-gradient)" strokeWidth="2" fill="none" />
+
+                {/* Right Top to Center */}
+                <path ref={pathRef3} d="M110%,100 C80%,100 70%,400 50% 60%" stroke="url(#line-gradient)" strokeWidth="2" fill="none" />
+
+                {/* Right Bottom to Center */}
+                <path ref={pathRef4} d="M110%,800 C80%,800 70%,500 50% 60%" stroke="url(#line-gradient)" strokeWidth="2" fill="none" />
+            </svg>
+
+            <div className="relative z-10 flex flex-col items-center gap-10">
+                <h2 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
+                    Let's build the impossible.
+                </h2>
+
+                {/* Button Container - positioned to match SVG convergence roughly */}
+                <div ref={buttonRef} className="rounded-full bg-white relative mt-8">
                     <MagneticButton>
                         <a
                             href="https://calendly.com/matteorossiroy/30min"
                             target="_blank"
                             rel="noreferrer"
-                            className="group relative flex items-center justify-center h-24 w-64 overflow-hidden rounded-full bg-white text-black transition-all hover:w-72"
+                            className="flex items-center gap-2 px-8 py-4 text-black font-bold tracking-wide rounded-full transition-colors hover:bg-neutral-100"
                         >
-                            <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                            <span className="relative z-10 text-xl font-bold tracking-widest transition-colors group-hover:text-white">START NOW</span>
+                            <span>Book a Call</span>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
                         </a>
                     </MagneticButton>
                 </div>
             </div>
 
-            <div className="absolute bottom-10 w-full px-12 flex justify-between text-[10px] text-zinc-500 uppercase tracking-widest font-mono">
-                <span>Local Time: {new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
-                <span>© 2025 MR</span>
+            <div className="absolute bottom-6 w-full text-center text-[10px] text-zinc-600 uppercase tracking-widest">
+                © 2025 Emotive Engineering.
             </div>
         </footer>
     );
