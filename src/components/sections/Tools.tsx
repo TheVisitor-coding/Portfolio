@@ -131,7 +131,7 @@ export default function Tools() {
     return (
         <section ref={sectionRef} className="relative w-full py-24 flex flex-col items-center">
             <div className="mb-12 text-center z-10">
-                <h2 className="text-4xl font-bold uppercase tracking-widest text-white/50 mix-blend-overlay">The Arsenal</h2>
+                <h2 className="text-4xl font-bold uppercase tracking-widest text-white/50 mix-blend-overlay">Mon Arsenal</h2>
             </div>
 
             <div ref={containerRef} className="relative h-[600px] w-full max-w-6xl rounded-3xl border border-white/5 bg-black/20 backdrop-blur-sm overflow-hidden cursor-crosshair">
