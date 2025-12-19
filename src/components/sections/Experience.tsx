@@ -6,16 +6,17 @@ import * as THREE from "three";
 import { createNoise3D } from "simplex-noise";
 
 // Organic "Thinking" Particles
-function SynapseField({ count = 1000 }) {
+function SynapseField({ count = 1500 }) {
     const mesh = useRef<THREE.InstancedMesh>(null);
     const noise3D = useMemo(() => createNoise3D(), []);
 
     const particles = useMemo(() => {
         const temp = [];
         for (let i = 0; i < count; i++) {
+            // Sphere distribution
             const theta = Math.random() * Math.PI * 2;
             const phi = Math.acos((Math.random() * 2) - 1);
-            const radius = 15 + Math.random() * 10; // Slightly tighter radius
+            const radius = 20 + Math.random() * 5;
 
             const x = radius * Math.sin(phi) * Math.cos(theta);
             const y = radius * Math.sin(phi) * Math.sin(theta);
@@ -33,9 +34,11 @@ function SynapseField({ count = 1000 }) {
         const time = state.clock.getElapsedTime();
 
         particles.forEach((particle, i) => {
-            const noise = noise3D(particle.x * 0.08, particle.y * 0.08, time * 0.3);
-            const scale = 1 + noise * 0.8;
+            // Organic noise movement
+            const noise = noise3D(particle.x * 0.05, particle.y * 0.05, time * 0.2);
+            const scale = 1 + noise * 0.5;
 
+            // Breathing effect
             const breath = Math.sin(time * 0.5) * 0.5;
 
             dummy.position.set(
@@ -44,30 +47,29 @@ function SynapseField({ count = 1000 }) {
                 particle.originalZ + Math.sin(time * 0.5 + i) * 0.5
             );
 
-            const s = Math.max(0.2, scale + breath); // Minimum scale increased
+            const s = Math.max(0.1, scale + breath);
             dummy.scale.set(s, s, s);
             dummy.rotation.set(s, s, s);
             dummy.updateMatrix();
 
             mesh.current!.setMatrixAt(i, dummy.matrix);
-
-            // Much brighter colors
+            // Dynamic color based on noise
             const color = new THREE.Color();
-            // Cyan to Purple shift, high lightness
-            color.setHSL(0.6 + noise * 0.2, 0.9, 0.7);
+            // Blue/Purple synapse shift
+            color.setHSL(0.6 + noise * 0.1, 0.8, 0.6);
             mesh.current!.setColorAt(i, color);
         });
         mesh.current.instanceMatrix.needsUpdate = true;
         if (mesh.current.instanceColor) mesh.current.instanceColor.needsUpdate = true;
 
-        mesh.current.rotation.y = time * 0.1;
+        // Slight rotation of the whole cloud
+        mesh.current.rotation.y = time * 0.05;
     });
 
     return (
         <instancedMesh ref={mesh} args={[undefined, undefined, count]}>
-            <dodecahedronGeometry args={[0.2, 0]} />
-            {/* MeshBasicMaterial is self-illuminated, better for visibility */}
-            <meshBasicMaterial transparent opacity={0.6} blending={THREE.AdditiveBlending} toneMapped={false} />
+            <icosahedronGeometry args={[0.15, 0]} />
+            <meshStandardMaterial transparent opacity={0.6} blending={THREE.AdditiveBlending} />
         </instancedMesh>
     );
 }
@@ -76,22 +78,26 @@ export default function Experience() {
     return (
         <section className="relative h-[60vh] w-full overflow-hidden bg-background">
             <div className="absolute inset-0 z-0">
-                <Canvas camera={{ position: [0, 0, 40], fov: 60 }} gl={{ antialias: true }}>
-                    <fog attach="fog" args={['#000', 30, 90]} />
-                    {/* Added ambient light just in case, though MeshBasic ignores it */}
-                    <ambientLight intensity={1} />
-                    <SynapseField count={1200} />
+                <Canvas camera={{ position: [0, 0, 50], fov: 60 }} gl={{ antialias: true }}>
+                    {/* Ambient context */}
+                    <fog attach="fog" args={['#000', 30, 80]} />
+                    <ambientLight intensity={0.5} />
+                    <pointLight position={[20, 20, 20]} intensity={2} color="#4f46e5" />
+                    <pointLight position={[-20, -20, -20]} intensity={2} color="#a855f7" />
+
+                    <SynapseField count={1000} />
                 </Canvas>
             </div>
 
             <div className="pointer-events-none relative z-10 flex h-full items-center justify-center text-center">
-                <div className="max-w-2xl px-6 mix-blend-difference">
-                    <div className="mx-auto mb-6 h-12 w-[1px] bg-white" />
+                <div className="max-w-2xl px-6">
+                    {/* Decorative line */}
+                    <div className="mx-auto mb-6 h-12 w-[1px] bg-gradient-to-b from-transparent via-white/50 to-transparent" />
 
-                    <h2 className="text-3xl font-light tracking-wide text-white sm:text-5xl font-serif italic drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]">
+                    <h2 className="text-3xl font-light tracking-wide text-white/90 sm:text-5xl font-serif italic">
                         "Cognitive Resonance"
                     </h2>
-                    <p className="mt-4 text-sm font-bold text-white uppercase tracking-widest drop-shadow-md">
+                    <p className="mt-4 text-sm font-light text-neutral-400 uppercase tracking-widest">
                         Bridging Imagination & Logic
                     </p>
                 </div>

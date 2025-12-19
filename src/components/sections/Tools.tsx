@@ -9,79 +9,64 @@ import MagneticButton from "@/components/ui/MagneticButton";
 gsap.registerPlugin(ScrollTrigger);
 
 const TOOLS = [
-    { name: "Next.js", icon: Icons.nextjs, color: "hover:bg-black hover:text-white" },
-    { name: "React", icon: Icons.react, color: "hover:bg-[#61DAFB]/20 hover:text-[#61DAFB]" },
-    { name: "TypeScript", icon: Icons.typescript, color: "hover:bg-[#3178C6]/20 hover:text-[#3178C6]" },
-    { name: "Figma", icon: Icons.figma, color: "hover:bg-[#F24E1E]/20 hover:text-[#F24E1E]" },
-    { name: "Tailwind", icon: Icons.tailwind, color: "hover:bg-[#38B2AC]/20 hover:text-[#38B2AC]" },
-    { name: "GSAP", icon: Icons.gsap, color: "hover:bg-[#88CE02]/20 hover:text-[#88CE02]" },
-    { name: "Three.js", icon: Icons.threejs, color: "hover:bg-white hover:text-black" },
-    { name: "Unity", icon: Icons.unity, color: "hover:bg-neutral-800 hover:text-white" },
+    { name: "Next.js", icon: Icons.nextjs },
+    { name: "React", icon: Icons.react },
+    { name: "TypeScript", icon: Icons.typescript },
+    { name: "Tailwind", icon: Icons.tailwind },
+    { name: "GSAP", icon: Icons.gsap },
+    { name: "Node.js", icon: Icons.nodejs },
+    { name: "Docker", icon: Icons.docker },
+    { name: "Figma", icon: Icons.figma },
+    { name: "Unity", icon: Icons.unity },
+    { name: "Three.js", icon: Icons.threejs },
 ];
 
 export default function Tools() {
     const sectionRef = useRef<HTMLDivElement>(null);
-    const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const ctx = gsap.context(() => {
-            const cards = gsap.utils.toArray<HTMLElement>(".tool-card");
-
-            // Initial set: Scattered all over the screen (relative to container)
-            // We want them to feel like they are floating in chaos
-            cards.forEach((card, i) => {
-                gsap.set(card, {
-                    x: gsap.utils.random(-800, 800),
-                    y: gsap.utils.random(-800, 800),
-                    rotation: gsap.utils.random(-45, 45),
-                    scale: gsap.utils.random(0.8, 1.2),
-                    opacity: 0,
-                });
-            });
-
-            // The Animation: Snap into a neat grid/stack
-            // We use scrub to control the "Assembly"
-            gsap.to(cards, {
-                x: 0,
-                y: 0,
-                rotation: 0,
-                scale: 1,
-                opacity: 1,
-                duration: 1,
-                stagger: 0.1,
-                ease: "power3.out",
-                scrollTrigger: {
-                    trigger: sectionRef.current,
-                    start: "top center",
-                    end: "bottom center",
-                    scrub: 1.5,
+            // Impact animation
+            gsap.fromTo(".tool-magnetic",
+                { scale: 0, opacity: 0, y: 100 },
+                {
+                    scale: 1,
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.8,
+                    stagger: {
+                        amount: 0.5,
+                        grid: [2, 5],
+                        from: "center"
+                    },
+                    ease: "back.out(1.5)",
+                    scrollTrigger: {
+                        trigger: sectionRef.current,
+                        start: "top 70%",
+                    }
                 }
-            });
-
+            );
         }, sectionRef);
 
         return () => ctx.revert();
     }, []);
 
     return (
-        <section ref={sectionRef} className="relative min-h-[100vh] flex flex-col items-center justify-center py-24 overflow-hidden">
-            {/* Scrolling text background maybe? kept clean for now */}
-
-            <div className="absolute top-10 text-center z-10 w-full">
-                <h2 className="text-4xl font-bold uppercase tracking-widest text-white/50 mix-blend-overlay">The Tools</h2>
+        <section ref={sectionRef} className="relative min-h-[50vh] flex flex-col items-center justify-center py-32 overflow-hidden">
+            <div className="mb-16 text-center z-10">
+                <h2 className="text-5xl font-bold tracking-tighter text-foreground sm:text-7xl">The Arsenal</h2>
+                {/* <p className="mt-4 text-xl text-muted-foreground">Precision instruments for digital chaos.</p> */}
             </div>
 
-            <div ref={containerRef} className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-6xl">
-                {TOOLS.map((tool) => (
-                    <div key={tool.name} className="tool-card relative">
+            <div className="relative flex w-full max-w-5xl flex-wrap items-center justify-center gap-6 px-4">
+                {TOOLS.map((tool, i) => (
+                    <div key={tool.name} className="tool-magnetic group">
                         <MagneticButton>
-                            <div
-                                className={`flex flex-col items-center justify-center gap-4 rounded-3xl border border-white/10 bg-neutral-900/80 p-12 backdrop-blur-xl transition-all duration-500 hover:scale-110 hover:z-50 hover:border-white/30 hover:shadow-[0_0_50px_-10px_rgba(255,255,255,0.2)] ${tool.color}`}
-                            >
-                                <div className="h-16 w-16 transition-transform hover:rotate-12">
+                            <div className="flex h-24 w-24 flex-col items-center justify-center gap-2 rounded-3xl border border-white/5 bg-white/5 backdrop-blur-md transition-all duration-300 group-hover:border-white/20 group-hover:bg-white/10 group-hover:scale-110 group-hover:shadow-[0_0_30px_-5px_rgba(255,255,255,0.1)]">
+                                <div className="h-8 w-8 text-neutral-400 group-hover:text-white transition-colors">
                                     <tool.icon className="h-full w-full" />
                                 </div>
-                                <span className="text-lg font-bold tracking-widest">{tool.name}</span>
+                                <span className="text-[10px] uppercase tracking-widest text-neutral-500 group-hover:text-white transition-colors">{tool.name}</span>
                             </div>
                         </MagneticButton>
                     </div>
