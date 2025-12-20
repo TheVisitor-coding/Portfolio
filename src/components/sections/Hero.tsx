@@ -121,7 +121,7 @@ export default function Hero() {
                 {/* Main Text (Unchanged) */}
                 <h1
                     ref={titleRef}
-                    className="font-sans text-6xl font-bold tracking-tight text-white sm:text-8xl md:text-9xl overflow-hidden leading-[1.1]"
+                    className="font-sans text-5xl font-bold tracking-tight text-white sm:text-8xl md:text-9xl overflow-hidden leading-[1.1]"
                 >
                     MATTÉO ROSSI
                 </h1>

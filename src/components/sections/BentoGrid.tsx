@@ -20,7 +20,7 @@ export default function BentoGrid() {
          Row 2: SaaS (..cont) | AR (..cont) | Architecture (..cont)
          Row 3: Automation (2x1) | Creative (2x1)
        */}
-            <div className="grid grid-cols-1 md:grid-cols-4 auto-rows-[minmax(180px,auto)] gap-4 lg:gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 auto-rows-[minmax(180px,auto)] gap-4 lg:gap-6">
 
                 {/* Main SaaS Card - Big focus */}
                 <SaaSMasterCard />
