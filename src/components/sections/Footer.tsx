@@ -109,7 +109,7 @@ export default function Footer() {
                             rel="noreferrer"
                             className="flex items-center gap-2 px-8 py-4 text-black font-bold tracking-wide rounded-full transition-colors hover:bg-neutral-100"
                         >
-                            <span>Book a Call</span>
+                            <span>Initialiser la Collaboration</span>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
                         </a>
                     </MagneticButton>

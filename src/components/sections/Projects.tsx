@@ -38,7 +38,7 @@ export default function Projects() {
         <section id="works" className="container mx-auto max-w-7xl px-4 py-32">
             <div className="mb-24 flex items-end justify-between border-b border-white/10 pb-8">
                 <div>
-                    <h2 className="text-4xl font-bold tracking-tighter text-white sm:text-6xl">Selected Works</h2>
+                    <h2 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">Explorations & Livrables</h2>
                     <p className="mt-4 text-muted-foreground">Engineering that speaks.</p>
                 </div>
                 <span className="hidden text-xl font-mono text-muted-foreground md:block">(03)</span>

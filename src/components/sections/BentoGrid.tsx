@@ -10,7 +10,7 @@ export default function BentoGrid() {
     return (
         <section className="container mx-auto max-w-7xl px-4 py-32">
             <div className="mb-16">
-                <h2 className="text-4xl font-bold tracking-tighter sm:text-5xl text-foreground">Digital Services</h2>
+                <h2 className="text-4xl font-bold tracking-tight sm:text-5xl text-foreground">Expertise & Stratégie</h2>
                 <p className="mt-4 text-lg text-muted-foreground">Comprehensive solutions for modern digital problems.</p>
             </div>
 
