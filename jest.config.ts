@@ -21,6 +21,13 @@ const config: Config = {
     transformIgnorePatterns: [
         '/node_modules/(?!(lenis|@gsap|gsap)/)'
     ],
+    collectCoverageFrom: [
+        'src/**/*.{js,jsx,ts,tsx}',
+        '!src/**/*.d.ts',
+        '!src/**/index.tsx', // logical index files often don't need tests
+        '!src/**/*.stories.{js,jsx,ts,tsx}',
+        '!src/__tests__/**/*',
+    ],
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

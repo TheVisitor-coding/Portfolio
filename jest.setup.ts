@@ -35,6 +35,17 @@ jest.mock('gsap', () => {
         from: jest.fn(),
         fromTo: jest.fn(),
         set: jest.fn(),
+        utils: {
+            toArray: jest.fn(() => []),
+        },
+        context: jest.fn((func) => {
+            return {
+                revert: jest.fn(),
+                add: jest.fn(),
+                conditions: {},
+                selector: jest.fn(),
+            }
+        }),
         timeline: jest.fn(() => ({
             to: jest.fn(),
             from: jest.fn(),
