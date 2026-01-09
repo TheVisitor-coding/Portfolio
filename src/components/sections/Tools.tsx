@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Icons } from "@/components/ui/Icons";
@@ -76,7 +76,7 @@ export default function Tools() {
 
                 const dx = ix - mouse.x;
                 const dy = iy - mouse.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
+                const dist = Math.hypot(dx, dy);
 
                 if (dist < 200) {
                     const opacity = 1 - (dist / 200);
@@ -134,7 +134,7 @@ export default function Tools() {
                 <h2 className="text-4xl font-bold uppercase tracking-widest text-white/50 mix-blend-overlay">Mon Arsenal</h2>
             </div>
 
-            <div ref={containerRef} className="relative h-[600px] w-full max-w-6xl rounded-3xl border border-white/5 bg-black/20 backdrop-blur-sm overflow-hidden cursor-crosshair">
+            <div ref={containerRef} className="relative h-150 w-full max-w-6xl rounded-3xl border border-white/5 bg-black/20 backdrop-blur-sm overflow-hidden cursor-crosshair">
                 <canvas ref={canvasRef} className="absolute inset-0 z-0 pointer-events-none" />
 
                 {TOOLS.map((tool, i) => (

@@ -85,7 +85,7 @@ function ProjectCard({ project }: { project: typeof PROJECTS[0] }) {
             {/* 16/9 Aspect Ratio Container */}
             <div className="relative aspect-video w-full overflow-hidden">
                 {/* Parallax Image Placeholder */}
-                <div ref={imageRef} className={`absolute inset-0 h-[120%] w-full bg-gradient-to-br ${project.color} opacity-80 transition-opacity duration-500 group-hover:opacity-100`}>
+                <div ref={imageRef} className={`absolute inset-0 h-[120%] w-full bg-linear-to-br ${project.color} opacity-80 transition-opacity duration-500 group-hover:opacity-100`}>
                     {/* Noise Overlay */}
                     <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-30 brightness-150 mix-blend-overlay" />
                 </div>
@@ -93,7 +93,7 @@ function ProjectCard({ project }: { project: typeof PROJECTS[0] }) {
                 {/* Overlay Content (Hidden by default, reveals on hover) - OR always visible for better UX? 
                     Let's make it a bottom strip that expands on hover 
                 */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-80" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-80" />
 
                 <div className="absolute bottom-0 left-0 w-full p-8 transition-transform duration-500 group-hover:-translate-y-2">
                     <div className="flex items-center justify-between">

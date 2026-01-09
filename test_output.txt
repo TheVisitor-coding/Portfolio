@@ -1,0 +1,28 @@
+[0m[7m[1m[31m FAIL [39m[22m[27m[0m [2msrc/__tests__/[22m[1mpage.test.tsx[22m
+  Home Page
+    [31m✕[39m [2mrenders without crashing (92 ms)[22m
+
+[1m[31m  [1m● [22m[1mHome Page › renders without crashing[39m[22m
+
+    AggregateError
+[2m[22m
+[2m    [0m [90m  5 |[39m describe([32m'Home Page'[39m[33m,[39m () [33m=>[39m {[22m
+[2m     [90m  6 |[39m     it([32m'renders without crashing'[39m[33m,[39m () [33m=>[39m {[22m
+[2m    [31m[1m>[22m[2m[39m[90m  7 |[39m         render([33m<[39m[33mPage[39m [33m/[39m[33m>[39m)[22m
+[2m     [90m    |[39m               [31m[1m^[22m[2m[39m[22m
+[2m     [90m  8 |[39m         [90m// Check for main element or something we know exists[39m[22m
+[2m     [90m  9 |[39m         [90m// Since we don't know exact content, we can check for a role or simple render[39m[22m
+[2m     [90m 10 |[39m         [36mconst[39m main [33m=[39m screen[33m.[39mgetByRole([32m'main'[39m)[0m[22m
+[2m[22m
+[2m      [2mat aggregateErrors ([22m[2mnode_modules/react/cjs/react.development.js[2m:551:11)[22m[2m[22m
+[2m      [2mat process.env.NODE_ENV.exports.act ([22m[2mnode_modules/react/cjs/react.development.js[2m:897:24)[22m[2m[22m
+[2m      [2mat [22m[2mnode_modules/@testing-library/react/dist/act-compat.js[2m:46:25[22m[2m[22m
+[2m      [2mat renderRoot ([22m[2mnode_modules/@testing-library/react/dist/pure.js[2m:189:26)[22m[2m[22m
+[2m      [2mat render ([22m[2mnode_modules/@testing-library/react/dist/pure.js[2m:291:10)[22m[2m[22m
+[2m      [2mat Object.<anonymous> ([22m[2m[0m[36msrc/__tests__/page.test.tsx[39m[0m[2m:7:15)[22m[2m[22m
+
+[1mTest Suites: [22m[1m[31m1 failed[39m[22m, 1 total
+[1mTests:       [22m[1m[31m1 failed[39m[22m, 1 total
+[1mSnapshots:   [22m0 total
+[1mTime:[22m        0.379 s, estimated 1 s
+[2mRan all test suites[22m[2m matching [22msrc/__tests__/page.test.tsx[2m.[22m
